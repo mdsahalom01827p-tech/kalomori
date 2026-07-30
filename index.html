@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+DOCTYPE html>
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
@@ -56,5 +56,20 @@ p{
 
 <button class="btn">কাজ শুরু করুন</button>
 
-</body>
+</body> <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBJu9oZvK4K3q7tjFuHicz-522lXVnRhDU",
+  authDomain: "kalomori-a637b.firebaseapp.com",
+  projectId: "kalomori-a637b",
+  storageBucket: "kalomori-a637b.firebasestorage.app",
+  messagingSenderId: "177260666749",
+  appId: "1:177260666749:web:09c93a73bfcd37eab23614",
+  measurementId: "G-W4L4EH2YG2"
+};
+
+initializeApp(firebaseConfig);
+console.log("Firebase Connected!");
+</script>
 </html>    
