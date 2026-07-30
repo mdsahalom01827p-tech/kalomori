@@ -18,84 +18,101 @@ font-family:Arial,sans-serif;
 body{
 background:#111827;
 color:#fff;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+}
+
+.container{
+width:95%;
+max-width:420px;
+background:#1f2937;
+padding:25px;
+border-radius:15px;
 text-align:center;
-padding:20px;
+box-shadow:0 0 15px rgba(0,0,0,.3);
 }
 
 h1{
-margin-top:30px;
 color:#00ff88;
-font-size:35px;
+margin-bottom:15px;
 }
 
-p{
-margin-top:20px;
-font-size:18px;
-line-height:30px;
+#userInfo{
+margin:20px 0;
+line-height:28px;
+font-size:17px;
 }
 
 button{
-margin-top:30px;
-padding:15px 30px;
-background:#00c853;
+width:100%;
+padding:15px;
+font-size:18px;
 border:none;
 border-radius:10px;
+background:#00c853;
 color:#fff;
-font-size:18px;
-}
-
-button:hover{
-background:#00a844;
+cursor:pointer;
 }
 </style>
+
 </head>
 
 <body>
 
+<div class="container">
+
 <h1>🌶️ কালো মরিচ</h1>
 
-<p id="userInfo">
-Telegram Mini App এ আপনাকে স্বাগতম
-</p>
+<div id="userInfo">
+লোড হচ্ছে...
+</div>
 
-<button>কাজ শুরু করুন</button>
+<button id="startBtn">
+কাজ শুরু করুন
+</button>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
 const firebaseConfig = {
-apiKey: "AIzaSyBJu9oZvK4K3q7tjFuHicz-522lXVnRhDU",
-authDomain: "kalomori-a637b.firebaseapp.com",
-projectId: "kalomori-a637b",
-storageBucket: "kalomori-a637b.firebasestorage.app",
-messagingSenderId: "177260666749",
-appId: "1:177260666749:web:09c93a73bfcd37eab23614",
-measurementId: "G-W4L4EH2YG2"
+  apiKey: "AIzaSyBJu9oZvK4K3q7tjFuHicz-522lXVnRhDU",
+  authDomain: "kalomori-a637b.firebaseapp.com",
+  projectId: "kalomori-a637b",
+  storageBucket: "kalomori-a637b.firebasestorage.app",
+  messagingSenderId: "177260666749",
+  appId: "1:177260666749:web:09c93a73bfcd37eab23614",
+  measurementId: "G-W4L4EH2YG2"
 };
 
-initializeApp(firebaseConfig);
-    const tg = window.Telegram.WebApp;
+const app = initializeApp(firebaseConfig);
 
+const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 
-const user = tg.initDataUnsafe.user;
-
-if (user) {
+const user = tg.initDataUnsafe?.user;
+    if (user) {
   document.getElementById("userInfo").innerHTML = `
-    👋 স্বাগতম, <b>${user.first_name}</b><br><br>
-    🆔 ID: ${user.id}<br>
-    👤 Username: @${user.username || "নেই"}
+    <h3>👋 স্বাগতম ${user.first_name}</h3>
+    <p>🆔 ID: ${user.id}</p>
+    <p>👤 Username: @${user.username || "নেই"}</p>
   `;
 } else {
-  document.getElementById("userInfo").innerHTML =
-    "Telegram থেকে Mini App খুলুন";
+  document.getElementById("userInfo").innerHTML = `
+    <h3>⚠️ Telegram Mini App থেকে খুলুন</h3>
+  `;
 }
 
-console.log("Firebase Connected!");
+document.getElementById("startBtn").addEventListener("click", () => {
+  alert("কাজ শুরু হবে পরের ধাপে");
+});console.log("Firebase Connected");
+console.log("Telegram User:", user);
 
 </script>
+
+</div>
 
 </body>
 </html>
