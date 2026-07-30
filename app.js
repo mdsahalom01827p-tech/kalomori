@@ -166,4 +166,110 @@ profileBtn.addEventListener("click", () => {
 
 });
 
-console.log("✅ Kalo Morich Mini App Ready");
+console.log("✅ Kalo Morich Mini App Ready");// ===============================
+// কালো মরিচ - Part 4
+// Task + Income System
+// ===============================
+
+// Daily Income
+const DAILY_REWARD = 10;
+
+// Task Button
+taskBtn.addEventListener("click", async () => {
+
+    const ok = confirm(
+        "আজকের টাস্ক সম্পন্ন করবেন?\n\nরিওয়ার্ড: ৳10"
+    );
+
+    if (!ok) return;
+
+    const userRef = doc(db, "users", String(user.id));
+
+    const snap = await getDoc(userRef);
+
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+
+    const newBalance = (data.balance || 0) + DAILY_REWARD;
+
+    await setDoc(userRef, {
+
+        ...data,
+
+        balance: newBalance,
+        totalIncome: (data.totalIncome || 0) + DAILY_REWARD,
+        lastTask: Date.now()
+
+    });
+
+    document.getElementById("balance").innerText =
+        "৳" + newBalance;
+
+    alert("🎉 অভিনন্দন!\n\n৳10 যোগ হয়েছে।");
+
+});// ===============================
+// কালো মরিচ - Part 5
+// Withdraw System
+// ===============================
+
+withdrawBtn.addEventListener("click", async () => {
+
+    const amount = prompt("কত টাকা Withdraw করবেন?");
+
+    if (!amount) return;
+
+    const withdrawAmount = Number(amount);
+
+    if (isNaN(withdrawAmount) || withdrawAmount <= 0) {
+        alert("সঠিক Amount লিখুন");
+        return;
+    }
+
+    const userRef = doc(db, "users", String(user.id));
+
+    const snap = await getDoc(userRef);
+
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+
+    if ((data.balance || 0) < withdrawAmount) {
+
+        alert("❌ পর্যাপ্ত Balance নেই");
+
+        return;
+
+    }
+
+    const withdrawRef = doc(
+        db,
+        "withdraws",
+        Date.now().toString()
+    );
+
+    await setDoc(withdrawRef, {
+
+        userId: user.id,
+        name: user.first_name,
+        username: user.username || "",
+        amount: withdrawAmount,
+        status: "Pending",
+        createdAt: serverTimestamp()
+
+    });
+
+    await setDoc(userRef, {
+
+        ...data,
+
+        balance: data.balance - withdrawAmount
+
+    });
+
+    document.getElementById("balance").innerText =
+        "৳" + (data.balance - withdrawAmount);
+
+    alert("✅ Withdraw Request পাঠানো হয়েছে");
+
+});
