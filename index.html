@@ -1,202 +1,108 @@
 <!DOCTYPE html>
 <html lang="bn">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>কালো মরিচ</title>
+<title>🌶️ কালো মরিচ</title>
+
+<link rel="stylesheet" href="style.css">
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
-body{
-background:#0f172a;
-color:white;
-}
-
-.page{
-display:none;
-padding:20px;
-}
-
-.active{
-display:block;
-}
-
-.logo{
-text-align:center;
-font-size:30px;
-font-weight:bold;
-margin-top:30px;
-color:#00ff88;
-}
-
-.card{
-background:#1e293b;
-padding:20px;
-border-radius:15px;
-margin-top:20px;
-}
-
-.btn{
-width:100%;
-padding:15px;
-border:none;
-border-radius:10px;
-background:#00c853;
-color:white;
-font-size:18px;
-margin-top:15px;
-}
-
-.balance{
-font-size:32px;
-font-weight:bold;
-text-align:center;
-color:#00ff88;
-}
-</style>
-
 </head>
+
 <body>
 
-<div id="homePage" class="page active">
+<div class="container">
 
-<div class="logo">
+<!-- Home Page -->
+
+<div id="homePage">
+
+<h1 class="logo">
 🌶️ কালো মরিচ
-</div>
+</h1>
 
 <div class="card">
 
-<h3 id="name">
-লোড হচ্ছে...
+<div id="userInfo">
+
+<p>লোড হচ্ছে...</p>
+
+</div>
+
+</div>
+
+<button id="startBtn">
+
+কাজ শুরু করুন
+
+</button>
+
+</div>
+
+<!-- Dashboard -->
+
+<div id="dashboardPage" style="display:none;">
+
+<h1 class="logo">
+
+📊 Dashboard
+
+</h1>
+
+<div class="card">
+
+<h3>
+
+বর্তমান ব্যালেন্স
+
 </h3>
 
-<p id="telegramId"></p>
+<h2 id="balance">
 
-<p id="username"></p>
+৳0
 
-<button class="btn" id="startBtn">
-কাজ শুরু করুন
+</h2>
+
+</div>
+
+<div class="menu">
+
+<button id="taskBtn">
+
+📋 Task
+
+</button>
+
+<button id="referBtn">
+
+👥 Referral
+
+</button>
+
+<button id="withdrawBtn">
+
+💵 Withdraw
+
+</button>
+
+<button id="profileBtn">
+
+👤 Profile
+
 </button>
 
 </div>
 
 </div>
 
-<div id="dashboardPage" class="page">
-
-<div class="logo">
-ড্যাশবোর্ড
 </div>
 
-<div class="card">
-
-<div class="balance" id="balance">
-৳0
-</div>
-
-<p style="text-align:center">
-বর্তমান ব্যালেন্স
-</p>
-
-</div>
-
-</div><script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import {
-getFirestore,
-doc,
-setDoc,
-getDoc,
-serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-const firebaseConfig = {
-
-apiKey: "AIzaSyBJu9oZvK4K3q7tjFuHicz-522lXVnRhDU",
-
-authDomain: "kalomori-a637b.firebaseapp.com",
-
-projectId: "kalomori-a637b",
-
-storageBucket: "kalomori-a637b.firebasestorage.app",
-
-messagingSenderId: "177260666749",
-
-appId: "1:177260666749:web:09c93a73bfcd37eab23614"
-
-};
-
-const app = initializeApp(firebaseConfig);
-
-const db = getFirestore(app);
-
-const tg = window.Telegram.WebApp;
-
-tg.ready();
-
-tg.expand();
-
-const user = tg.initDataUnsafe.user;
-
-if(user){
-
-document.getElementById("name").innerHTML="👋 "+user.first_name;
-
-document.getElementById("telegramId").innerHTML="ID : "+user.id;
-
-document.getElementById("username").innerHTML="@"+(user.username||"নেই");
-
-await saveUser();
-
-}
-
-async function saveUser(){
-
-const ref=doc(db,"users",String(user.id));
-
-const snap=await getDoc(ref);
-
-if(!snap.exists()){
-
-await setDoc(ref,{
-
-telegramId:user.id,
-
-name:user.first_name,
-
-username:user.username||"",
-
-balance:0,
-
-referral:0,
-
-joined:serverTimestamp()
-
-});
-
-}
-
-}
-
-document.getElementById("startBtn").onclick=function(){
-
-document.getElementById("homePage").classList.remove("active");
-
-document.getElementById("dashboardPage").classList.add("active");
-
-};
-
-</script>
+<script type="module" src="app.js"></script>
 
 </body>
 
