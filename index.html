@@ -1,49 +1,51 @@
 <!DOCTYPE html>
-<html lang="bn"><script src="https://telegram.org/js/telegram-web-app.js"></script>
+<html lang="bn">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>কালো মরিচ</title>
 
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <style>
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,sans-serif;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
 }
 
 body{
-    background:#111827;
-    color:white;
-    text-align:center;
-    padding:20px;
+background:#111827;
+color:#fff;
+text-align:center;
+padding:20px;
 }
 
 h1{
-    color:#00ff88;
-    margin-top:30px;
-    font-size:35px;
+margin-top:30px;
+color:#00ff88;
+font-size:35px;
 }
 
 p{
-    margin-top:15px;
-    font-size:18px;
+margin-top:20px;
+font-size:18px;
+line-height:30px;
 }
 
-.btn{
-    margin-top:30px;
-    background:#00c853;
-    color:white;
-    padding:15px 30px;
-    border:none;
-    border-radius:10px;
-    font-size:18px;
-    cursor:pointer;
+button{
+margin-top:30px;
+padding:15px 30px;
+background:#00c853;
+border:none;
+border-radius:10px;
+color:#fff;
+font-size:18px;
 }
 
-.btn:hover{
-    background:#00a844;
+button:hover{
+background:#00a844;
 }
 </style>
 </head>
@@ -52,24 +54,48 @@ p{
 
 <h1>🌶️ কালো মরিচ</h1>
 
-<p>Telegram Mini App এ আপনাকে স্বাগতম</p>
+<p id="userInfo">
+Telegram Mini App এ আপনাকে স্বাগতম
+</p>
 
-<button class="btn">কাজ শুরু করুন</button>
+<button>কাজ শুরু করুন</button>
 
-</body> <script type="module">
+<script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBJu9oZvK4K3q7tjFuHicz-522lXVnRhDU",
-  authDomain: "kalomori-a637b.firebaseapp.com",
-  projectId: "kalomori-a637b",
-  storageBucket: "kalomori-a637b.firebasestorage.app",
-  messagingSenderId: "177260666749",
-  appId: "1:177260666749:web:09c93a73bfcd37eab23614",
-  measurementId: "G-W4L4EH2YG2"
+apiKey: "AIzaSyBJu9oZvK4K3q7tjFuHicz-522lXVnRhDU",
+authDomain: "kalomori-a637b.firebaseapp.com",
+projectId: "kalomori-a637b",
+storageBucket: "kalomori-a637b.firebasestorage.app",
+messagingSenderId: "177260666749",
+appId: "1:177260666749:web:09c93a73bfcd37eab23614",
+measurementId: "G-W4L4EH2YG2"
 };
 
 initializeApp(firebaseConfig);
+    const tg = window.Telegram.WebApp;
+
+tg.ready();
+tg.expand();
+
+const user = tg.initDataUnsafe.user;
+
+if (user) {
+  document.getElementById("userInfo").innerHTML = `
+    👋 স্বাগতম, <b>${user.first_name}</b><br><br>
+    🆔 ID: ${user.id}<br>
+    👤 Username: @${user.username || "নেই"}
+  `;
+} else {
+  document.getElementById("userInfo").innerHTML =
+    "Telegram থেকে Mini App খুলুন";
+}
+
 console.log("Firebase Connected!");
+
 </script>
-</html>    
+
+</body>
+</html>
