@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="bn">
-
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🌶️ কালো মরিচ</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-
 *{
 margin:0;
 padding:0;
@@ -20,64 +16,61 @@ font-family:Arial,sans-serif;
 }
 
 body{
-background:#111827;
+background:#0f172a;
 color:#fff;
 max-width:420px;
 margin:auto;
-padding:12px;
-}
-
-.card{
-background:#1f2937;
-padding:12px;
-border-radius:12px;
-margin-bottom:10px;
+padding:15px;
 }
 
 .logo{
 text-align:center;
-font-size:24px;
+font-size:28px;
 font-weight:bold;
-margin-bottom:10px;
-color:#00ff88;
+color:#22c55e;
+margin:15px 0;
+}
+
+.card{
+background:#1e293b;
+padding:15px;
+border-radius:12px;
+margin-bottom:12px;
 }
 
 #userInfo{
 text-align:center;
-line-height:24px;
+line-height:26px;
 font-size:15px;
 }
 
-.balance{
-font-size:30px;
-font-weight:bold;
+#balance{
 text-align:center;
-color:#00ff88;
-margin-top:8px;
+font-size:36px;
+font-weight:bold;
+color:#22c55e;
 }
 
 .grid{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:8px;
-margin-top:10px;
+gap:10px;
 }
 
 button{
-height:42px;
 border:none;
-border-radius:8px;
-background:#16a34a;
-color:#fff;
-font-size:14px;
+border-radius:10px;
+padding:14px;
+font-size:15px;
 font-weight:bold;
+background:#16a34a;
+color:white;
 cursor:pointer;
 }
 
 button:active{
 transform:scale(.98);
 }
-
 </style>
 
 </head>
@@ -89,50 +82,30 @@ transform:scale(.98);
 </div>
 
 <div class="card">
-
 <div id="userInfo">
-
 লোড হচ্ছে...
-
 </div>
-
 </div>
 
 <div class="card">
-
-<div class="balance" id="balance">
-
+<div id="balance">
 ৳0
-
 </div>
-
 </div>
 
 <div class="grid">
 
-<button id="taskBtn">
-📋 Task
-</button>
+<button id="taskBtn">📋 Task</button>
 
-<button id="referBtn">
-👥 Referral
-</button>
+<button id="referBtn">👥 Referral</button>
 
-<button id="withdrawBtn">
-💸 Withdraw
-</button>
+<button id="withdrawBtn">💸 Withdraw</button>
 
-<button id="historyBtn">
-📜 History
-</button>
+<button id="historyBtn">📜 History</button>
 
-<button id="profileBtn">
-👤 Profile
-</button>
+<button id="profileBtn">👤 Profile</button>
 
-<button id="supportBtn">
-☎ Support
-</button>
+<button id="supportBtn">☎ Support</button>
 
 </div>
 
@@ -143,231 +116,202 @@ getFirestore,
 doc,
 getDoc,
 setDoc,
+updateDoc,
+collection,
+addDoc,
+query,
+where,
+getDocs,
 serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
+  apiKey: "AIzaSyBJu9oZvK4K3q7tjFuHicz-522lXVnRhDU",
+  authDomain: "kalomori-a637b.firebaseapp.com",
+  projectId: "kalomori-a637b",
+  storageBucket: "kalomori-a637b.firebasestorage.app",
+  messagingSenderId:// ======================
+// User Save + Balance
+// ======================
 
-apiKey:"AIzaSyBJu9oZvK4K3q7tjFuHicz-522lXVnRhDU",
+async function loadUser(){
 
-authDomain:"kalomori-a637b.firebaseapp.com",
+    const snap = await getDoc(userRef);
 
-projectId:"kalomori-a637b",
+    if(!snap.exists()){
 
-storageBucket:"kalomori-a637b.firebasestorage.app",
+        await setDoc(userRef,{
+            telegramId:user.id,
+            firstName:user.first_name,
+            username:user.username || "",
+            balance:0,
+            referral:0,
+            totalIncome:0,
+            lastTask:"",
+            joinedAt:serverTimestamp()
+        });
 
-messagingSenderId:"177260666749",
+        balance.innerText="৳0";
 
-appId:"1:177260666749:web:09c93a73bfcd37eab23614"
+    }else{
+
+        const data=snap.data();
+
+        balance.innerText="৳"+(data.balance || 0);
+
+    }
+
+}
+
+await loadUser();
+
+// ======================
+// Page Navigation
+// ======================
+
+const pages=document.querySelectorAll(".page");
+
+function showPage(id){
+
+    pages.forEach(p=>p.style.display="none");
+
+    document.getElementById(id).style.display="block";
+
+}
+
+document.getElementById("taskBtn").onclick=()=>showPage("task");
+
+document.getElementById("referBtn").onclick=()=>showPage("refer");
+
+document.getElementById("withdrawBtn").onclick=()=>showPage("withdraw");
+
+document.getElementById("historyBtn").onclick=()=> // ======================
+// Daily Task
+// ======================
+
+document.getElementById("taskBtn").onclick = async () => {
+
+  const snap = await getDoc(userRef);
+
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+
+  const today = new Date().toDateString();
+
+  if (data.lastTask === today) {
+    alert("আজকের Task ইতিমধ্যে সম্পন্ন হয়েছে।");
+    return;
+  }
+
+  const newBalance = (data.balance || 0) + 10;
+
+  await updateDoc(userRef, {
+    balance: newBalance,
+    totalIncome: (data.totalIncome || 0) + 10,
+    lastTask: today
+  });
+
+  balance.innerText = "৳" + newBalance;
+
+  alert("🎉 ৳10 যোগ হয়েছে!");
+};
+
+// ======================
+// Referral
+// ======================
+
+document.getElementById("referBtn").onclick = async () => {
+
+  const link = `https://t.me/YOUR_BOT_USERNAME?start=${user.id}`;
+
+  try {
+    await navigator.clipboard.writeText(link);
+    alert("Referral Link কপি হয়েছে");
+  } catch {
+    alert(link);
+  }
+
+};// ======================
+// Withdraw
+// ======================
+
+document.getElementById("withdrawBtn").onclick = async () => {
+
+  const amount = prompt("Withdraw Amount");
+
+  if (!amount) return;
+
+  const number = prompt("নগদ / বিকাশ নম্বর");
+
+  if (!number) return;
+
+  const snap = await getDoc(userRef);
+
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+
+  const currentBalance = data.balance || 0;
+
+  if (Number(amount) > currentBalance) {
+    alert("❌ পর্যাপ্ত Balance নেই");
+    return;
+  }
+
+  await addDoc(collection(db, "withdraws"), {
+    userId: user.id,
+    name: user.first_name,
+    username: user.username || "",
+    amount: Number(amount),
+    number: number,
+    status: "Pending",
+    createdAt: serverTimestamp()
+  });
+
+  await updateDoc(userRef, {
+    balance: currentBalance - Number(amount)
+  });
+
+  balance.innerText = "৳" + (currentBalance - Number(amount));
+
+  alert("✅ Withdraw Request পাঠানো হয়েছে");
 
 };
 
-const app=initializeApp(firebaseConfig);
+// ======================
+// History
+// ======================
 
-const db=getFirestore(app);
+document.getElementById("historyBtn").onclick = async () => {
 
-const tg=window.Telegram.WebApp;
+  const q = query(
+    collection(db, "withdraws"),
+    where("userId", "==", user.id)
+  );
 
-tg.ready();// =========================
-// Daily Task System
-// =========================
+  const snap = await getDocs(q);
 
-import {
-updateDoc
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+  if (snap.empty) {
+    alert("কোন Withdraw History নেই");
+    return;
+  }
 
-const taskBtn=document.getElementById("taskBtn");
+  let text = "📜 Withdraw History\n\// ======================
+// Profile
+// ======================
 
-taskBtn.onclick=async()=>{
+document.getElementById("profileBtn").onclick = async () => {
 
-const snap=await getDoc(userRef);
+  const snap = await getDoc(userRef);
 
-if(!snap.exists()) return;
+  if (!snap.exists()) return;
 
-const data=snap.data();
+  const data = snap.data();
 
-const today=new Date().toDateString();
+  alert(
+`👤 ${user.first_name}
 
-if(data.lastTask===today){
+🆔 ${user.id}
 
-alert("✅ আজকের Task ইতিমধ্যে সম্পন্ন হয়েছে।");
-
-return;
-
-}
-
-const newBalance=(data.balance||0)+10;
-
-await updateDoc(userRef,{
-
-balance:newBalance,
-
-lastTask:today,
-
-totalIncome:(data.// =========================
-// Referral System
-// =========================
-
-import {
-updateDoc
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-const referBtn=document.getElementById("referBtn");
-
-referBtn.onclick=async()=>{
-
-const link=`https://t.me/YourBotUsername?start=${user.id}`;
-
-try{
-
-await navigator.clipboard.writeText(link);
-
-alert("✅ Referral Link Copy হয়েছে\n\n"+link);
-
-}catch(e){
-
-alert(link);
-
-}
-
-};
-
-// Referral Bonus
-async function checkReferral(){
-
-const https://t.me/// =========================
-// Withdraw System
-// =========================
-
-import {
-collection,
-addDoc
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-const withdrawBtn=document.getElementById("withdrawBtn");
-
-withdrawBtn.onclick=async()=>{
-
-const amount=prompt("Withdraw Amount (৳)");
-
-if(!amount) return;
-
-const number=prompt("নগদ / বিকাশ নম্বর");
-
-if(!number) return;
-
-const snap=await getDoc(userRef);
-
-if(!snap.exists()) return;
-
-const data=snap.data();
-
-const balanceNow=data.balance||0;
-
-if(Number(amount)>balanceNow){
-
-alert("❌ পর্যাপ্ত Balance নেই");
-
-return;
-
-}
-
-await addDoc(collection(db,"withdraws"),{
-
-userId:user.id,
-
-name:user.first_name,
-
-username:user.username||"",
-
-amount:Number(amount),
-
-number:number,
-
-method:"Nagad/Bkash",
-
-status:"Pending",
-
-createdAt:serverTimestamp()
-
-});
-
-await updateDoc(userRef,{
-
-balance:// =========================
-// History + Profile + Support
-// =========================
-
-import {
-collection,
-query,
-where,
-getDocs
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-const historyBtn=document.getElementById("historyBtn");
-const profileBtn=document.getElementById("profileBtn");
-const supportBtn=document.getElementById("supportBtn");
-
-// Withdraw History
-historyBtn.onclick=async()=>{
-
-const q=query(
-collection(db,"withdraws"),
-where("userId","==",user.id)
-);
-
-const snap=await getDocs(q);
-
-if(snap.empty){
-
-alert("📭 কোনো Withdraw History নেই");
-
-return;
-
-}
-
-let txt="📜 Withdraw History\n\n";
-
-snap.forEach(d=>{
-
-https://t.me/// =========================
-// Auto Refresh + Telegram Open
-// =========================
-
-// Balance Refresh
-async function refreshBalance(){
-
-const snap=await getDoc(userRef);
-
-if(!snap.exists()) return;
-
-const data=snap.data();
-
-balance.innerHTML="৳"+(data.balance||0);
-
-}
-
-// প্রতি ৫ সেকেন্ডে Balance Refresh
-setInterval(refreshBalance,5000);
-
-// Telegram Channel Open
-function openChannel(){
-
-tg.openTelegramLink("https://t.me/YourChannelUsername");
-
-}// =========================
-// App Ready
-// =========================
-
-console.log("🌶️ কালো মরিচ Mini App Ready");
-
-refreshBalance();
-
-</script>
-
-</body>
-</html>
-
-// Support Button
-supportBtn.onclick=
+💰 Balance: ৳
