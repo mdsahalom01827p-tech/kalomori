@@ -273,3 +273,253 @@ withdrawBtn.addEventListener("click", async () => {
     alert("✅ Withdraw Request পাঠানো হয়েছে");
 
 });
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import {
+getFirestore,
+doc,
+getDoc,
+setDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyBJu9oZvK4K3q7tjFuHicz-522lXVnRhDU",
+  authDomain: "kalomori-a637b.firebaseapp.com",
+  projectId: "kalomori-a637b",
+  storageBucket: "kalomori-a637b.firebasestorage.app",
+  messagingSenderId: "177260666749",
+  appId: "1:177260666749:web:09c93a73bfcd37eab23614"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Telegram
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+
+const user = tg.initDataUnsafe?.user;
+
+const userInfo = document.getElementById("userInfo");
+const homePage = document.getElementById("homePage");
+const dashboardPage = document.getElementById("dashboardPage");
+
+const startBtn = document.getElementById("startBtn");
+const taskBtn = document.getElementById("taskBtn");
+const referBtn = document.getElementById("referBtn");
+const withdrawBtn = document.getElementById("withdrawBtn");
+const historyBtn = document.getElementById("historyBtn");
+const profileBtn = document.getElementById("profileBtn");
+
+const balanceText = document.getElementById("balance");
+
+if (!user) {
+
+    userInfo.innerHTML = "<h3>⚠️ Telegram Mini App থেকে খুলুন</h3>";
+    throw new Error("Telegram User Not Found");
+
+}
+
+// User Info
+userInfo.innerHTML = `
+<h2>👋 ${user.first_name}</h2>
+<p>🆔 ${user.id}</p>
+<p>👤 @${user.username || "নেই"}</p>
+`;
+
+const userRef = doc(db, "users", String(user.id));
+
+// Save User
+async function saveUser(){
+
+    const snap = await getDoc(userRef);
+
+    if(!snap.exists()){
+
+        await setDoc(userRef,{
+            telegramId:user.id,
+            firstName:user.first_name,
+            username:user.username || "",
+            balance:0,
+            referral:0,
+            totalIncome:0,
+            joinedAt:serverTimestamp()
+        });
+
+    }
+
+}
+
+// Load Balance
+async function loadBalance(){
+
+    const snap = await getDoc(userRef);
+
+    if(snap.exists()){
+
+        const data = snap.data();
+
+        balanceText.innerText="৳"+(data.balance || 0);
+
+    }
+
+}
+
+await saveUser();
+await loadBalance();// ===============================
+// Dashboard + Daily Task + Referral
+// ===============================
+
+// Home → Dashboard
+startBtn.addEventListener("click", async () => {
+
+    homePage.style.display = "none";
+    dashboardPage.style.display = "block";
+
+    await loadBalance();
+
+});
+
+// Daily Task (দিনে একবার)
+taskBtn.addEventListener("click", async () => {
+
+    const snap = await getDoc(userRef);
+
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+
+    const today = new Date().toDateString();
+
+    if (data.lastTask === today) {
+
+        alert("✅ আজকের টাস্ক ইতিমধ্যে সম্পন্ন হয়েছে।");
+        return;
+
+    }
+
+    const reward = 10;
+
+    await setDoc(userRef, {
+
+        ...data,
+
+        balance: (data.balance || 0) + reward,
+        totalIncome: (data.totalIncome || 0) + reward,
+        lastTask: today
+
+    });
+
+    await loadBalance();
+
+    alert("🎉 অভিনন্দন!\n\n৳10 যোগ হয়েছে।");
+
+});
+
+// Referral Link
+referBtn.addEventListener("click", async () => {
+
+    const link =
+    `https://t.me/KaloMorich_Bot?start=${user.id}`;
+
+    try{
+
+        await navigator.clipboard.writeText(link);
+
+        alert("✅ Referral Link Copy হয়েছে");
+
+    }catch{
+
+        alert(link);
+
+    }
+
+});
+
+// Profile
+profileBtn.addEventListener("click", async () => {
+
+    const snap = await getDoc(userRef);
+
+    if(!snap.exists()) return;
+
+    const data = snap.data();
+
+    alert(
+`👤 ${user.first_name}
+
+🆔 ${user.id}
+
+💰
+// ===============================
+// Withdraw + History
+// ===============================
+
+import {
+collection,
+addDoc,
+query,
+where,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Withdraw
+withdrawBtn.addEventListener("click", async () => {
+
+    const amount = prompt("কত টাকা Withdraw করবেন?");
+
+    if (!amount) return;
+
+    const number = prompt("আপনার bKash / Nagad নম্বর লিখুন");
+
+    if (!number) return;
+
+    const snap = await getDoc(userRef);
+
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+
+    const balance = data.balance || 0;
+
+    if (Number(amount) > balance) {
+
+        alert("❌ পর্যাপ্ত Balance নেই");
+
+        return;
+
+    }
+
+    await addDoc(collection(db, "withdraws"), {
+
+        userId: user.id,
+        name: user.first_name,
+        username: user.username || "",
+        amount: Number(amount),
+        number: number,
+        status: "Pending",
+        createdAt: serverTimestamp()
+
+    });
+
+    await setDoc(userRef, {
+
+        ...data,
+
+        balance: balance - Number(amount)
+
+    });
+
+    await loadBalance();
+
+    alert("✅ Withdraw Request সফলভাবে পাঠানো হয়েছে");
+
+});
+
+// History
+historyBtn.addEventListener("click", async () => {
+
+    const q = query(
+       
