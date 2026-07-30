@@ -92,3 +92,71 @@ button{
 }
 
 }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#0b1120;
+    color:#ffffff;
+}
+
+.container{
+    width:100%;
+    max-width:430px;
+    margin:auto;
+    padding:20px;
+}
+
+.logo{
+    text-align:center;
+    color:#00c853;
+    font-size:34px;
+    margin:25px 0;
+    font-weight:bold;
+}
+
+.card{
+    background:#161b22;
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 5px 15px rgba(0,0,0,.35);
+}
+
+#userInfo{
+    text-align:center;
+    line-height:30px;
+    font-size:18px;
+}
+
+#userInfo h2,
+#userInfo h3{
+    margin-bottom:10px;
+}
+
+.btn{
+    width:100%;
+    border:none;
+    outline:none;
+    padding:15px;
+    margin-top:12px;
+    border-radius:12px;
+    background:#2563eb;
+    color:#fff;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.btn:active{
+    transform:scale(.98);
+}
+
+#balance{
+    text-align:center;
+    font-size:
