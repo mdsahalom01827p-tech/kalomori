@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>কালো মরিচ</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -16,103 +17,187 @@ font-family:Arial,sans-serif;
 }
 
 body{
-background:#111827;
-color:#fff;
-display:flex;
-justify-content:center;
-align-items:center;
-min-height:100vh;
+background:#0f172a;
+color:white;
 }
 
-.container{
-width:95%;
-max-width:420px;
-background:#1f2937;
-padding:25px;
-border-radius:15px;
+.page{
+display:none;
+padding:20px;
+}
+
+.active{
+display:block;
+}
+
+.logo{
 text-align:center;
-box-shadow:0 0 15px rgba(0,0,0,.3);
-}
-
-h1{
+font-size:30px;
+font-weight:bold;
+margin-top:30px;
 color:#00ff88;
-margin-bottom:15px;
 }
 
-#userInfo{
-margin:20px 0;
-line-height:28px;
-font-size:17px;
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:15px;
+margin-top:20px;
 }
 
-button{
+.btn{
 width:100%;
 padding:15px;
-font-size:18px;
 border:none;
 border-radius:10px;
 background:#00c853;
-color:#fff;
-cursor:pointer;
+color:white;
+font-size:18px;
+margin-top:15px;
+}
+
+.balance{
+font-size:32px;
+font-weight:bold;
+text-align:center;
+color:#00ff88;
 }
 </style>
 
 </head>
-
 <body>
 
-<div class="container">
+<div id="homePage" class="page active">
 
-<h1>🌶️ কালো মরিচ</h1>
-
-<div id="userInfo">
-লোড হচ্ছে...
+<div class="logo">
+🌶️ কালো মরিচ
 </div>
 
-<button id="startBtn">
+<div class="card">
+
+<h3 id="name">
+লোড হচ্ছে...
+</h3>
+
+<p id="telegramId"></p>
+
+<p id="username"></p>
+
+<button class="btn" id="startBtn">
 কাজ শুরু করুন
 </button>
 
-<script type="module">
+</div>
+
+</div>
+
+<div id="dashboardPage" class="page">
+
+<div class="logo">
+ড্যাশবোর্ড
+</div>
+
+<div class="card">
+
+<div class="balance" id="balance">
+৳0
+</div>
+
+<p style="text-align:center">
+বর্তমান ব্যালেন্স
+</p>
+
+</div>
+
+</div><script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import {
+getFirestore,
+doc,
+setDoc,
+getDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBJu9oZvK4K3q7tjFuHicz-522lXVnRhDU",
-  authDomain: "kalomori-a637b.firebaseapp.com",
-  projectId: "kalomori-a637b",
-  storageBucket: "kalomori-a637b.firebasestorage.app",
-  messagingSenderId: "177260666749",
-  appId: "1:177260666749:web:09c93a73bfcd37eab23614",
-  measurementId: "G-W4L4EH2YG2"
+
+apiKey: "AIzaSyBJu9oZvK4K3q7tjFuHicz-522lXVnRhDU",
+
+authDomain: "kalomori-a637b.firebaseapp.com",
+
+projectId: "kalomori-a637b",
+
+storageBucket: "kalomori-a637b.firebasestorage.app",
+
+messagingSenderId: "177260666749",
+
+appId: "1:177260666749:web:09c93a73bfcd37eab23614"
+
 };
 
 const app = initializeApp(firebaseConfig);
 
+const db = getFirestore(app);
+
 const tg = window.Telegram.WebApp;
+
 tg.ready();
+
 tg.expand();
 
-const user = tg.initDataUnsafe?.user;
-    if (user) {
-  document.getElementById("userInfo").innerHTML = `
-    <h3>👋 স্বাগতম ${user.first_name}</h3>
-    <p>🆔 ID: ${user.id}</p>
-    <p>👤 Username: @${user.username || "নেই"}</p>
-  `;
-} else {
-  document.getElementById("userInfo").innerHTML = `
-    <h3>⚠️ Telegram Mini App থেকে খুলুন</h3>
-  `;
+const user = tg.initDataUnsafe.user;
+
+if(user){
+
+document.getElementById("name").innerHTML="👋 "+user.first_name;
+
+document.getElementById("telegramId").innerHTML="ID : "+user.id;
+
+document.getElementById("username").innerHTML="@"+(user.username||"নেই");
+
+await saveUser();
+
 }
 
-document.getElementById("startBtn").addEventListener("click", () => {
-  alert("কাজ শুরু হবে পরের ধাপে");
-});console.log("Firebase Connected");
-console.log("Telegram User:", user);
+async function saveUser(){
+
+const ref=doc(db,"users",String(user.id));
+
+const snap=await getDoc(ref);
+
+if(!snap.exists()){
+
+await setDoc(ref,{
+
+telegramId:user.id,
+
+name:user.first_name,
+
+username:user.username||"",
+
+balance:0,
+
+referral:0,
+
+joined:serverTimestamp()
+
+});
+
+}
+
+}
+
+document.getElementById("startBtn").onclick=function(){
+
+document.getElementById("homePage").classList.remove("active");
+
+document.getElementById("dashboardPage").classList.add("active");
+
+};
 
 </script>
 
-</div>
-
 </body>
+
 </html>
